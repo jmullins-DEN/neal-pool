@@ -119,17 +119,26 @@ function getColor(t){return TC[t]||(cc[t]||(cc[t]=FALLBACK[ci++%FALLBACK.length]
 
 function parseDate(s){
   if(!s)return null;
-  var m=s.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})/);
-  if(!m)return null;
-  return new Date(+m[3],+m[1]-1,+m[2]);
+  if(s instanceof Date)return s;
+  var str=String(s).trim();
+  // MM/DD/YYYY
+  var m=str.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})/);
+  if(m)return new Date(+m[3],+m[1]-1,+m[2]);
+  // YYYY-MM-DD or ISO datetime
+  var m2=str.match(/^(\d{4})-(\d{2})-(\d{2})/);
+  if(m2)return new Date(+m2[1],+m2[2]-1,+m2[3]);
+  // Excel serial number (numeric)
+  if(!isNaN(str)){var n=parseFloat(str);if(n>40000&&n<60000){var d=new Date(1899,11,30);d.setDate(d.getDate()+Math.floor(n));return d;}}
+  // Fallback
+  var d=new Date(str);return isNaN(d)?null:d;
 }
 
 
 ALL_EVENTS.forEach(function(e){e._d=parseDate(e.Time);});
 
-// Date filter: 3-day grace, 30-day window
-var grace=new Date();grace.setDate(grace.getDate()-3);
-var start30=new Date(grace);start30.setDate(start30.getDate()-30);
+// Date filter: 3-day grace, 90-day window
+var grace=new Date();grace.setDate(grace.getDate()+1);
+var start30=new Date(grace);start30.setDate(start30.getDate()-90);
 var start90=new Date(grace);start90.setDate(start90.getDate()-90);
 
 var currentFilter='all';
