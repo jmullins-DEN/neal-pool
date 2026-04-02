@@ -136,9 +136,9 @@ function parseDate(s){
 
 ALL_EVENTS.forEach(function(e){e._d=parseDate(e.Time);});
 
-// Date filter: 3-day grace, 90-day window
-var grace=new Date();grace.setDate(grace.getDate()+1);
-var start30=new Date(grace);start30.setDate(start30.getDate()-90);
+// Date filter: 3-day grace, 30-day window
+var grace=new Date();grace.setDate(grace.getDate()-3);
+var start30=new Date(grace);start30.setDate(start30.getDate()-30);
 var start90=new Date(grace);start90.setDate(start90.getDate()-90);
 
 var currentFilter='all';
@@ -219,7 +219,7 @@ function render(evts){
   document.getElementById('kAS').innerHTML='<b>'+activeDrivers+'</b> active drivers';
   if(topT){document.getElementById('kMC').textContent=topT;document.getElementById('kMT').innerHTML='<b>'+topC+'</b> events';}
 
-  // Bar chart by week — last 90 days
+  // Bar chart by week — last 30 days
   var evts90=ALL_EVENTS.filter(function(e){return e._d&&e._d>=start90&&e._d<=grace;});
   var wk={};
   evts90.forEach(function(e){
